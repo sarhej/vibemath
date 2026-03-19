@@ -1,0 +1,6 @@
+web/node_modules/
+web/dist/
+web/coverage/
+web/.vite/
+web/*.tsbuildinfo
+.DS_Store
