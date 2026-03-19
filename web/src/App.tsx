@@ -121,6 +121,7 @@ function App() {
         appCount: state.appCount,
         appComplexity: state.appComplexity,
         slotHours: state.slotHours,
+        linkWorkHoursToUsage: state.linkWorkHoursToUsage,
         activeHoursPerWeek: state.activeHoursPerWeek,
         electricityUsdPerKwh: state.electricityUsdPerKwh,
         linesPerHour: state.linesPerHour,
@@ -145,6 +146,7 @@ function App() {
       state.amortizationYears,
       state.hideSoftQuotaSubscriptions,
       state.enabledCategories,
+      state.linkWorkHoursToUsage,
       state.selectedModelId,
     ],
   )
@@ -296,7 +298,7 @@ function App() {
                       <span className="text-sm font-medium text-slate-200">Lines per month</span>
                       <Button
                         variant="subtle"
-                        size="xs"
+                        size="sm"
                         className="h-7 rounded-lg text-[10px] uppercase tracking-wider"
                         onClick={state.syncTargetToProductivity}
                       >
@@ -354,7 +356,6 @@ function App() {
                         aria-label="Link hours"
                         checked={state.linkWorkHoursToUsage}
                         onCheckedChange={state.setLinkWorkHoursToUsage}
-                        size="sm"
                       />
                     </div>
                   </div>

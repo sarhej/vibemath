@@ -17,6 +17,7 @@ export type CalculatorInputs = {
   appCount: number
   appComplexity: AppComplexity
   slotHours: number
+  linkWorkHoursToUsage: boolean
   activeHoursPerWeek: number
   electricityUsdPerKwh: number
   linesPerHour: number

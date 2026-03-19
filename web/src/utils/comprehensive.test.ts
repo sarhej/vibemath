@@ -8,6 +8,7 @@ const baseInputs: CalculatorInputs = {
   appCount: 2,
   appComplexity: 'medium',
   slotHours: 160,
+  linkWorkHoursToUsage: true,
   activeHoursPerWeek: 20,
   electricityUsdPerKwh: 0.18,
   linesPerHour: 700,
