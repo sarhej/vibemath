@@ -56,9 +56,71 @@ const defaults: CalculatorInputs = {
   selectedModelId: vibeCoderModelsRanked[0].id,
 }
 
+type CompactShareState = {
+  m: OutputMode
+  l: number
+  a: number
+  c: AppComplexity
+  h: number
+  w: number
+  p: number
+  y: number
+  q: number
+  t: number
+  o: number
+  d: number
+  k: 0 | 1
+  s: string
+  r: string[]
+  g: string[]
+}
+
 function parseNumber(value: string | null, fallback: number) {
   const parsed = Number(value)
   return Number.isFinite(parsed) ? parsed : fallback
+}
+
+function encodeCompactState(state: CalculatorInputs & { agreedModelIds?: string[] }) {
+  const compact: CompactShareState = {
+    m: state.outputMode,
+    l: state.targetLines,
+    a: state.appCount,
+    c: state.appComplexity,
+    h: state.slotHours,
+    w: state.activeHoursPerWeek,
+    p: state.electricityUsdPerKwh,
+    y: state.linesPerHour,
+    q: state.parallelWorkstreams,
+    t: state.tokensPerLine,
+    o: state.amortizationYears,
+    d: state.hideSoftQuotaSubscriptions ? 1 : 0,
+    k: state.linkWorkHoursToUsage ? 1 : 0,
+    s: state.selectedModelId,
+    r: state.agreedModelIds ?? [],
+    g: Object.entries(state.enabledCategories)
+      .filter(([, enabled]) => enabled)
+      .map(([key]) => key),
+  }
+
+  const json = JSON.stringify(compact)
+  const bytes = new TextEncoder().encode(json)
+  let binary = ''
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte)
+  }
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
+}
+
+function decodeCompactState(value: string): CompactShareState | null {
+  try {
+    const padded = value.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(value.length / 4) * 4, '=')
+    const binary = atob(padded)
+    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0))
+    const json = new TextDecoder().decode(bytes)
+    return JSON.parse(json) as CompactShareState
+  } catch {
+    return null
+  }
 }
 
 export const useCalculatorStore = create<CalculatorState>((set) => ({
@@ -120,41 +182,56 @@ export const useCalculatorStore = create<CalculatorState>((set) => ({
     })),
   hydrateFromUrl: (search) => {
     const params = new URLSearchParams(search)
+    const compact = decodeCompactState(params.get('s') ?? '')
     const outputMode = params.get('mode')
     const appComplexity = params.get('complexity')
     const categoryFlags = params.get('categories')
 
     set((state) => ({
-      outputMode: outputMode === 'apps' ? 'apps' : defaults.outputMode,
-      targetLines: parseNumber(params.get('lines'), state.targetLines),
-      appCount: parseNumber(params.get('apps'), state.appCount),
+      outputMode: compact?.m ?? (outputMode === 'apps' ? 'apps' : defaults.outputMode),
+      targetLines: compact?.l ?? parseNumber(params.get('lines'), state.targetLines),
+      appCount: compact?.a ?? parseNumber(params.get('apps'), state.appCount),
       appComplexity:
-        appComplexity === 'simple' || appComplexity === 'medium' || appComplexity === 'complex'
+        compact?.c ??
+        (appComplexity === 'simple' || appComplexity === 'medium' || appComplexity === 'complex'
           ? appComplexity
-          : defaults.appComplexity,
-      slotHours: parseNumber(params.get('slotHours'), state.slotHours),
-      activeHoursPerWeek: parseNumber(params.get('weeklyHours'), state.activeHoursPerWeek),
-      electricityUsdPerKwh: parseNumber(params.get('power'), state.electricityUsdPerKwh),
-      linesPerHour: parseNumber(params.get('lph'), state.linesPerHour),
+          : defaults.appComplexity),
+      slotHours: compact?.h ?? parseNumber(params.get('slotHours'), state.slotHours),
+      activeHoursPerWeek: compact?.w ?? parseNumber(params.get('weeklyHours'), state.activeHoursPerWeek),
+      electricityUsdPerKwh: compact?.p ?? parseNumber(params.get('power'), state.electricityUsdPerKwh),
+      linesPerHour: compact?.y ?? parseNumber(params.get('lph'), state.linesPerHour),
       parallelWorkstreams:
-        parseNumber(params.get('parallel'), state.parallelWorkstreams) in parallelWorkstreamMultipliers
+        compact?.q
+          ? ((compact.q as keyof typeof parallelWorkstreamMultipliers) in parallelWorkstreamMultipliers
+              ? (compact.q as keyof typeof parallelWorkstreamMultipliers)
+              : state.parallelWorkstreams)
+          : parseNumber(params.get('parallel'), state.parallelWorkstreams) in parallelWorkstreamMultipliers
           ? (parseNumber(
               params.get('parallel'),
               state.parallelWorkstreams,
             ) as keyof typeof parallelWorkstreamMultipliers)
           : state.parallelWorkstreams,
-      tokensPerLine: parseNumber(params.get('tpl'), state.tokensPerLine),
-      amortizationYears: parseNumber(params.get('amort'), state.amortizationYears),
-      selectedModelId: params.get('model') ?? state.selectedModelId,
-      hideSoftQuotaSubscriptions: params.get('dotted') !== '1',
-      linkWorkHoursToUsage: params.get('link') !== '0',
+      tokensPerLine: compact?.t ?? parseNumber(params.get('tpl'), state.tokensPerLine),
+      amortizationYears: compact?.o ?? parseNumber(params.get('amort'), state.amortizationYears),
+      selectedModelId: compact?.s ?? params.get('model') ?? state.selectedModelId,
+      hideSoftQuotaSubscriptions: compact ? compact.d === 1 : params.get('dotted') !== '1',
+      linkWorkHoursToUsage: compact ? compact.k === 1 : params.get('link') !== '0',
       agreedModelIds: (() => {
+        if (compact?.r) return compact.r
         const raw = params.get('models')
         if (!raw) return state.agreedModelIds
         const ids = raw.split(',').map((s) => s.trim()).filter(Boolean)
         return ids.length > 0 ? ids : state.agreedModelIds
       })(),
-      enabledCategories: categoryFlags
+      enabledCategories: compact?.g
+        ? {
+            subscription: compact.g.includes('subscription'),
+            api: compact.g.includes('api'),
+            'home-hardware': compact.g.includes('home-hardware'),
+            hyperscaler: compact.g.includes('hyperscaler'),
+            marketplace: compact.g.includes('marketplace'),
+          }
+        : categoryFlags
         ? {
             subscription: categoryFlags.includes('subscription'),
             api: categoryFlags.includes('api'),
@@ -169,35 +246,6 @@ export const useCalculatorStore = create<CalculatorState>((set) => ({
 
 export function buildShareQuery(state: CalculatorInputs & { agreedModelIds?: string[] }) {
   const params = new URLSearchParams()
-
-  params.set('mode', state.outputMode)
-  params.set('lines', String(state.targetLines))
-  params.set('apps', String(state.appCount))
-  params.set('complexity', state.appComplexity)
-  params.set('slotHours', String(state.slotHours))
-  params.set('weeklyHours', String(state.activeHoursPerWeek))
-  params.set('power', String(state.electricityUsdPerKwh))
-  params.set('lph', String(state.linesPerHour))
-  params.set('parallel', String(state.parallelWorkstreams))
-  params.set('tpl', String(state.tokensPerLine))
-  params.set('amort', String(state.amortizationYears))
-  params.set('model', state.selectedModelId)
-  if (!state.hideSoftQuotaSubscriptions) {
-    params.set('dotted', '1')
-  }
-  if (!state.linkWorkHoursToUsage) {
-    params.set('link', '0')
-  }
-  if (state.agreedModelIds?.length) {
-    params.set('models', state.agreedModelIds.join(','))
-  }
-  params.set(
-    'categories',
-    Object.entries(state.enabledCategories)
-      .filter(([, enabled]) => enabled)
-      .map(([key]) => key)
-      .join(','),
-  )
-
+  params.set('s', encodeCompactState(state))
   return params.toString()
 }

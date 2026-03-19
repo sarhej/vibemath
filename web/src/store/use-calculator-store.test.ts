@@ -25,10 +25,8 @@ describe('calculator store', () => {
     const query = buildShareQuery(state)
     const params = new URLSearchParams(query)
 
-    expect(params.get('mode')).toBe('lines')
-    expect(params.get('lines')).toBe('30000')
-    expect(params.get('parallel')).toBe('1')
-    expect(params.get('categories')).toContain('subscription')
+    expect(params.get('s')).toBeTruthy()
+    expect(params.has('mode')).toBe(false)
   })
 
   it('toggles categories', () => {
