@@ -41,6 +41,7 @@ Help users compare the real monthly cost of AI-assisted software development acr
 
 ## Project ecosystem
 
+- Open source: https://github.com/sarhej/vibemath
 - `strt.it`: founder site and method hub
 - `vibeforces.com`: AI-first MVP delivery platform
 - `vibemath.dev`: neutral economics engine for comparing AI coding setups
