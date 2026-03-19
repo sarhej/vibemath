@@ -1,4 +1,4 @@
-import { Copy, Download, Link2, Save, Sparkles, Trash2 } from 'lucide-react'
+import { Copy, Download, ExternalLink, Github, Link2, Save, Sparkles, Trash2 } from 'lucide-react'
 import { toPng } from 'html-to-image'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -63,6 +63,7 @@ function writeStoredProfiles(profiles: SavedProfile[]) {
 
 function App() {
   const containerRef = useRef<HTMLDivElement>(null)
+  const chartContainerRef = useRef<HTMLDivElement>(null)
   const [feedback, setFeedback] = useState<string | null>(null)
   const [chartReady, setChartReady] = useState(false)
   const [profileName, setProfileName] = useState('')
@@ -76,8 +77,24 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const frame = window.requestAnimationFrame(() => setChartReady(true))
-    return () => window.cancelAnimationFrame(frame)
+    const element = chartContainerRef.current
+    if (!element) return
+
+    const updateChartReady = () => {
+      const rect = element.getBoundingClientRect()
+      setChartReady(rect.width > 0 && rect.height > 0)
+    }
+
+    updateChartReady()
+
+    const frame = window.requestAnimationFrame(updateChartReady)
+    const observer = new ResizeObserver(updateChartReady)
+    observer.observe(element)
+
+    return () => {
+      window.cancelAnimationFrame(frame)
+      observer.disconnect()
+    }
   }, [])
 
   useEffect(() => {
@@ -577,7 +594,10 @@ function App() {
               </CardDescription>
             </CardHeader>
             <CardContent className="min-w-0">
-              <div className="h-[58vh] min-h-[540px] min-w-0 w-full rounded-[2rem] border border-slate-800 bg-slate-950/30 p-2">
+              <div
+                ref={chartContainerRef}
+                className="h-[58vh] min-h-[540px] min-w-0 w-full rounded-[2rem] border border-slate-800 bg-slate-950/30 p-2"
+              >
                   {chartReady ? (
                     <ResponsiveContainer width="100%" height="100%" minWidth={280} minHeight={320}>
                       <LineChart data={chartData} margin={{ left: 16, right: 16, top: 24, bottom: 42 }}>
@@ -927,6 +947,30 @@ function App() {
           </div>
         </div>
       </div>
+
+      <footer className="mt-16 border-t border-slate-800/80 py-6">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-6 px-4 text-sm text-slate-500">
+          <a
+            href="https://github.com/sarhej/vibemath"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/50 px-3 py-2 text-slate-400 transition hover:border-slate-700 hover:text-slate-200"
+          >
+            <Github className="h-4 w-4" aria-hidden />
+            Open source on GitHub
+            <ExternalLink className="h-3.5 w-3.5 opacity-70" aria-hidden />
+          </a>
+          <a
+            href="https://strt.it"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/50 px-3 py-2 text-slate-400 transition hover:border-slate-700 hover:text-slate-200"
+          >
+            <span aria-hidden>strt.it</span>
+            <ExternalLink className="h-3.5 w-3.5 opacity-70" aria-hidden />
+          </a>
+        </div>
+      </footer>
     </main>
   )
 }
