@@ -1,0 +1,55 @@
+# Vibemath
+
+Vibemath is a web-based calculator for AI coding economics.
+
+## Purpose
+
+Help users compare the real monthly cost of AI-assisted software development across:
+
+- coding subscriptions
+- direct model APIs
+- self-hosted local hardware
+- rented cloud GPUs
+
+## Audience
+
+- developers
+- indie hackers
+- technical founders
+- CTOs
+- teams evaluating AI coding workflows
+
+## What the tool models
+
+- monthly lines of code or app-equivalent output
+- work hours per month
+- accepted LOC per hour
+- parallel AI workstreams
+- context-heavy token consumption
+- subscription quotas and overage
+- self-hosted amortization and electricity
+- productivity penalties for weaker local models
+- break-even points between different delivery setups
+
+## Important terms
+
+- `tokens per net LOC`: total tokens consumed per accepted line of code, including context and output
+- `productivity multiplier`: quality-adjusted throughput factor for the selected model
+- `home-hosted cost`: monthly amortization plus variable electricity cost
+- `saved local profile`: browser-stored calculator state
+- `share URL`: query-string encoded calculator state
+
+## Project ecosystem
+
+- `strt.it`: founder site and method hub
+- `vibeforces.com`: AI-first MVP delivery platform
+- `vibemath.dev`: neutral economics engine for comparing AI coding setups
+
+## Technical stack
+
+- React
+- Vite
+- TypeScript
+- Zustand
+- Recharts
+- Vitest
