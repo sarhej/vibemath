@@ -18,6 +18,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './components/ui/select'
 import { Slider } from './components/ui/slider'
 import { Switch } from './components/ui/switch'
+import { formatChangelogDate, pricingChangelog } from './data/changelog'
 import {
   homeHardware,
   parallelWorkstreamMultipliers,
@@ -246,18 +247,18 @@ function App() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
       <div className="w-full px-4 py-6 sm:px-6 xl:px-8 2xl:px-12">
-        <div className="mb-6 flex flex-col gap-4 rounded-[2rem] border border-cyan-500/10 bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.12),_transparent_42%),linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,0.98))] p-6 shadow-2xl shadow-cyan-950/30">
+        <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-cyan-500/10 bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.12),_transparent_42%),linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,0.98))] p-4 shadow-2xl shadow-cyan-950/30 sm:rounded-[2rem] sm:p-6">
           <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
-            <div className="space-y-3">
+            <div className="space-y-3 min-w-0">
               <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/25 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-200">
-                <Sparkles className="h-3.5 w-3.5" />
+                <Sparkles className="h-3.5 w-3.5 shrink-0" />
                 Vibe coder economics
               </div>
               <div>
-                <h1 className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+                <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
                   AI coding cost calculator
                 </h1>
-                <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-300 sm:text-base">
+                <p className="mt-2 max-w-3xl text-xs leading-5 text-slate-300 sm:mt-3 sm:text-sm sm:leading-6 lg:text-base">
                   Compare subscriptions, API providers, Macs, home GPU rigs, hyperscalers, and marketplaces by
                   cost-to-output. Subscription lines now model full monthly billing, included quota, and post-quota
                   overage where it is publicly documented. The chart uses straight segments and quota markers so the
@@ -266,14 +267,14 @@ function App() {
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-3">
-              <Button variant="ghost" onClick={shareLink}>
+            <div className="flex flex-shrink-0 flex-wrap gap-2 sm:gap-3">
+              <Button variant="ghost" onClick={shareLink} className="min-h-[44px] min-w-[44px] touch-manipulation">
                 <Link2 className="h-4 w-4" />
-                Copy URL
+                <span className="sm:inline">Copy URL</span>
               </Button>
-              <Button onClick={exportPng}>
+              <Button onClick={exportPng} className="min-h-[44px] min-w-[44px] touch-manipulation">
                 <Download className="h-4 w-4" />
-                Export PNG
+                <span className="sm:inline">Export PNG</span>
               </Button>
             </div>
           </div>
@@ -281,11 +282,21 @@ function App() {
           {feedback ? <p className="text-sm text-cyan-200">{feedback}</p> : null}
         </div>
 
-        <div ref={containerRef} className="flex flex-col gap-6">
-          <Card className="w-full">
-            <CardHeader>
-              <CardTitle>Controls</CardTitle>
-              <CardDescription>Tune your assumptions. The chart updates at slider speed.</CardDescription>
+        <div ref={containerRef} className="flex flex-col gap-4 sm:gap-6">
+          <Card className="w-full" id="controls">
+            <CardHeader className="space-y-1">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <CardTitle>Controls</CardTitle>
+                  <CardDescription>Tune your assumptions. The chart updates at slider speed.</CardDescription>
+                </div>
+                <a
+                  href="#chart"
+                  className="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-slate-700 bg-slate-800/60 px-4 text-sm font-medium text-cyan-200 transition hover:bg-slate-700/60 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 sm:hidden"
+                >
+                  Jump to chart
+                </a>
+              </div>
             </CardHeader>
             <CardContent className="grid grid-cols-1 gap-6 lg:grid-cols-3">
               <div className="space-y-6">
@@ -297,12 +308,14 @@ function App() {
                     <Button
                       variant={state.outputMode === 'lines' ? 'default' : 'subtle'}
                       onClick={() => state.setOutputMode('lines')}
+                      className="min-h-[44px] touch-manipulation"
                     >
                       Lines of code
                     </Button>
                     <Button
                       variant={state.outputMode === 'apps' ? 'default' : 'subtle'}
                       onClick={() => state.setOutputMode('apps')}
+                      className="min-h-[44px] touch-manipulation"
                     >
                       Apps x complexity
                     </Button>
@@ -408,7 +421,7 @@ function App() {
                       return (
                         <button
                           key={template.id}
-                          className={`group relative rounded-xl border px-3 py-2 text-left transition ${
+                          className={`group relative min-h-[44px] rounded-xl border px-3 py-2.5 text-left touch-manipulation transition ${
                             isActive
                               ? 'border-cyan-400/60 bg-cyan-400/10'
                               : 'border-slate-800 bg-slate-950/60 hover:border-slate-700'
@@ -585,10 +598,10 @@ function App() {
             </CardContent>
           </Card>
 
-          <Card className="min-w-0">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-2xl">Cost vs output</CardTitle>
-              <CardDescription>
+          <Card className="min-w-0" id="chart">
+            <CardHeader className="pb-2 sm:pb-4">
+              <CardTitle className="text-xl sm:text-2xl">Cost vs output</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">
                 Full-width comparison. X: LOC, tokens, hours/mo. Y: total monthly cost USD. Target:{' '}
                 {scenario.effectiveTargetLines.toLocaleString()} LOC this month.
               </CardDescription>
@@ -596,10 +609,10 @@ function App() {
             <CardContent className="min-w-0">
               <div
                 ref={chartContainerRef}
-                className="h-[58vh] min-h-[540px] min-w-0 w-full rounded-[2rem] border border-slate-800 bg-slate-950/30 p-2"
+                className="h-[50vh] min-h-[320px] w-full min-w-0 rounded-xl border border-slate-800 bg-slate-950/30 p-2 sm:min-h-[420px] md:h-[58vh] md:min-h-[540px] md:rounded-[2rem]"
               >
                   {chartReady ? (
-                    <ResponsiveContainer width="100%" height="100%" minWidth={280} minHeight={320}>
+                    <ResponsiveContainer width="100%" height="100%" minWidth={260} minHeight={280}>
                       <LineChart data={chartData} margin={{ left: 16, right: 16, top: 24, bottom: 42 }}>
                         <CartesianGrid stroke="#1e293b" vertical={false} />
                         <XAxis
@@ -945,29 +958,53 @@ function App() {
                   </CardContent>
                 </Card>
           </div>
+
+          <Card className="border-slate-800 bg-slate-950/40" id="recent-changes">
+            <CardHeader>
+              <CardTitle className="text-base sm:text-lg">Recent changes</CardTitle>
+              <CardDescription>
+                Pricing and provider rows we add or refresh from public list prices. Spot, commitment, and regional
+                discounts are not modeled in the chart.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-8">
+              {pricingChangelog.map((entry) => (
+                <div key={entry.date}>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-cyan-400">
+                    {formatChangelogDate(entry.date)}
+                  </p>
+                  <ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-relaxed text-slate-300">
+                    {entry.items.map((item, i) => (
+                      <li key={`${entry.date}-${i}`}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
         </div>
       </div>
 
-      <footer className="mt-16 border-t border-slate-800/80 py-6">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-6 px-4 text-sm text-slate-500">
+      <footer className="mt-12 border-t border-slate-800/80 py-6 pb-[env(safe-area-inset-bottom)]">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-4 px-4 text-sm text-slate-500 sm:gap-6">
           <a
             href="https://github.com/sarhej/vibemath"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/50 px-3 py-2 text-slate-400 transition hover:border-slate-700 hover:text-slate-200"
+            className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center gap-2 rounded-lg border border-slate-800 bg-slate-900/50 px-4 py-3 text-slate-400 transition hover:border-slate-700 hover:text-slate-200"
           >
-            <Github className="h-4 w-4" aria-hidden />
+            <Github className="h-4 w-4 shrink-0" aria-hidden />
             Open source on GitHub
-            <ExternalLink className="h-3.5 w-3.5 opacity-70" aria-hidden />
+            <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
           </a>
           <a
             href="https://strt.it"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/50 px-3 py-2 text-slate-400 transition hover:border-slate-700 hover:text-slate-200"
+            className="inline-flex min-h-[44px] min-w-[44px] touch-manipulation items-center justify-center gap-2 rounded-lg border border-slate-800 bg-slate-900/50 px-4 py-3 text-slate-400 transition hover:border-slate-700 hover:text-slate-200"
           >
-            <span aria-hidden>strt.it</span>
-            <ExternalLink className="h-3.5 w-3.5 opacity-70" aria-hidden />
+            <span>strt.it</span>
+            <ExternalLink className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
           </a>
         </div>
       </footer>

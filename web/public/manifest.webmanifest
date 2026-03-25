@@ -1,0 +1,20 @@
+{
+  "name": "Vibemath",
+  "short_name": "Vibemath",
+  "description": "AI coding economics calculator — compare subscriptions, APIs, self-hosted GPUs, and cloud hardware.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#020817",
+  "background_color": "#020817",
+  "categories": ["productivity", "developer tools"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -13,7 +13,7 @@ export function Slider({ className, ...props }: SliderProps) {
       <SliderPrimitive.Track className="relative h-2 w-full grow overflow-hidden rounded-full bg-slate-800">
         <SliderPrimitive.Range className="absolute h-full bg-cyan-400" />
       </SliderPrimitive.Track>
-      <SliderPrimitive.Thumb className="block h-5 w-5 rounded-full border border-cyan-200/70 bg-cyan-300 shadow-lg ring-offset-slate-950 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200" />
+      <SliderPrimitive.Thumb className="slider-thumb-touch block h-5 w-5 rounded-full border border-cyan-200/70 bg-cyan-300 shadow-lg ring-offset-slate-950 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-200" />
     </SliderPrimitive.Root>
   )
 }

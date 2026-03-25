@@ -409,17 +409,40 @@ export const homeHardware: HomeHardwareOffering[] = [
   { id: 'custom-cluster', name: 'Custom AI Cluster', category: 'home-hardware', purchasePriceUsd: 15000, powerWatts: 2200, color: '#facc15', vramGb: 320 },
 ] as const
 
+/**
+ * Hyperscaler rows: illustrative on-demand GPU-hour equivalents (US-style list prices).
+ * Spot / commitment discounts are not modeled; refresh quarterly from each vendor’s pricing pages.
+ */
 export const rentedHyperscalers: RentalOffering[] = [
-  { id: 'aws-h100', name: 'AWS H100', category: 'hyperscaler', hourlyRateUsd: 3.93, color: '#ffcc66' },
+  { id: 'aws-h100', name: 'AWS H100 (p5.4xlarge / GPU)', category: 'hyperscaler', hourlyRateUsd: 3.93, color: '#ffcc66' },
   { id: 'azure-a100-80gb', name: 'Azure A100 80GB', category: 'hyperscaler', hourlyRateUsd: 3.67, color: '#f7b955' },
   { id: 'gcp-l4', name: 'GCP L4', category: 'hyperscaler', hourlyRateUsd: 0.82, color: '#ffd86a' },
 ] as const
 
+/**
+ * Marketplaces & neoclouds: on-demand list prices where published (Mar 2026).
+ * - RunPod: https://www.runpod.io/gpu-pricing
+ * - Lambda Cloud instances: https://lambda.ai/service/gpu-cloud/pricing (effective Apr 2026 on site)
+ * - Nebius: https://nebius.com/prices (HGX H100/H200 per GPU-hour)
+ * - Vast.ai: host-set spot rates; 0.67 ≈ typical mid-listing for A100 80GB (verify live console)
+ */
 export const rentedMarketplaces: RentalOffering[] = [
-  { id: 'runpod-a100', name: 'RunPod A100 80GB', category: 'marketplace', hourlyRateUsd: 1.39, color: '#78a6ff' },
+  { id: 'runpod-a100', name: 'RunPod A100 SXM 80GB', category: 'marketplace', hourlyRateUsd: 1.39, color: '#78a6ff' },
+  { id: 'runpod-h100-pcie', name: 'RunPod H100 PCIe 80GB', category: 'marketplace', hourlyRateUsd: 1.99, color: '#7dd3fc' },
+  { id: 'runpod-h200', name: 'RunPod H200 141GB', category: 'marketplace', hourlyRateUsd: 3.59, color: '#d946ef' },
   { id: 'runpod-l40s', name: 'RunPod L40S', category: 'marketplace', hourlyRateUsd: 0.79, color: '#5e8fff' },
-  { id: 'vast-a100', name: 'Vast.ai A100 80GB', category: 'marketplace', hourlyRateUsd: 0.67, color: '#8db0ff' },
-  { id: 'lambda-h100', name: 'Lambda H100', category: 'marketplace', hourlyRateUsd: 2.79, color: '#9fc0ff' },
+  { id: 'vast-a100', name: 'Vast.ai A100 80GB (typical)', category: 'marketplace', hourlyRateUsd: 0.67, color: '#8db0ff' },
+  { id: 'lambda-h100', name: 'Lambda H100 SXM 80GB', category: 'marketplace', hourlyRateUsd: 3.99, color: '#9fc0ff' },
+  { id: 'nebius-h100', name: 'Nebius HGX H100 (GPU-hr)', category: 'marketplace', hourlyRateUsd: 2.95, color: '#86efac' },
+  { id: 'nebius-h200', name: 'Nebius HGX H200 (GPU-hr)', category: 'marketplace', hourlyRateUsd: 3.5, color: '#4ade80' },
+  // GPUaaS.com (wholesale broker): advertised bare-metal H200 India ~$1.85/hr — see https://gpuaas.com/clusters-h200
+  {
+    id: 'gpuaas-h200-india',
+    name: 'GPUaaS H200 bare metal (India)',
+    category: 'marketplace',
+    hourlyRateUsd: 1.85,
+    color: '#c4b5fd',
+  },
 ] as const
 
 export const allOfferings: Offering[] = [
