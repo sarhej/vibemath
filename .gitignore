@@ -4,3 +4,10 @@ web/coverage/
 web/.vite/
 web/*.tsbuildinfo
 .DS_Store
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
